@@ -86,12 +86,15 @@ public class Lucene {
     reader.close();
   }
 
-  private static void addDoc(IndexWriter w, String title, String isbn) throws IOException {
+  private static void addDoc(IndexWriter w, String title, String docID, String text) throws IOException {
     Document doc = new Document();
-    doc.add(new TextField("title", title, Field.Store.YES));
+    TextField titleField = new TextField("title", title, Field.Store.YES);
+    titleField.setBoost(5f);
+    doc.add(titleField);
    // doc.add(new TextField("body",text, Field.Store.YES));
     // use a string field for isbn because we don't want it tokenized
-    doc.add(new StringField("isbn", isbn, Field.Store.YES));
+    doc.add(new StringField("id", docID, Field.Store.YES));
+    doc.add(new TextField("text", text, Field.Store.YES));
     w.addDocument(doc);
   }
   
@@ -99,7 +102,7 @@ public class Lucene {
     ReadFile r = new ReadFile();
     r.openFile(aFile);
     r.readFile();
-    addDoc(w, r.getTitle(), docId);
+    addDoc(w, r.getTitle(), docId, r.getText());
     r.closeFile();
   }
   
